@@ -10,6 +10,7 @@ group :development do
   gem 'pry'
   gem 'rubocop'
   gem 'rubocop-rspec'
+  gem 'rugged', '~> 0.27.5'
 end
 
 group :test do

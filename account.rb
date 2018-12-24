@@ -1,5 +1,6 @@
+# frozen_string_literal: true
+
 require 'yaml'
-require 'pry'
 
 class Account
   attr_accessor :login, :name, :card, :password, :file_path
@@ -10,10 +11,10 @@ class Account
   end
 
   def console
-      puts 'Hello, we are RubyG bank!'
-      puts '- If you want to create account - press `create`'
-      puts '- If you want to load account - press `load`'
-      puts '- If you want to exit - press `exit`'
+    puts 'Hello, we are RubyG bank!'
+    puts '- If you want to create account - press `create`'
+    puts '- If you want to load account - press `load`'
+    puts '- If you want to exit - press `exit`'
 
     # FIRST SCENARIO. IMPROVEMENT NEEDED
 

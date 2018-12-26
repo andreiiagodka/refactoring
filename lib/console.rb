@@ -2,7 +2,7 @@
 
 require 'yaml'
 
-class Account
+class Console
   attr_accessor :login, :name, :card, :password, :file_path
 
   CONSOLE_COMMANDS = {
@@ -21,30 +21,9 @@ class Account
     da: 'da'
   }.freeze
 
-  CARDS = {
-    usual: {
-      type: 'usual',
-      number: 16.times.map{rand(10)}.join,
-      balance: 50.00
-    },
-    capitalist: {
-      type: 'capitalist',
-      number: 16.times.map{rand(10)}.join,
-      balance: 100.00
-    },
-    virtual: {
-      type: 'virtual',
-      number: 16.times.map{rand(10)}.join,
-      balance: 150.00
-    }
-  }.freeze
-
-  ACCOUNTS_FILE_NAME = 'accounts'
-  YML_FORMAT = '.yml'
-
   def initialize
     @errors = []
-    @file_path = ACCOUNTS_FILE_NAME + YML_FORMAT
+    @file_path = Account::ACCOUNTS_FILE_NAME + Account::YML_FORMAT
   end
 
   def console
@@ -54,59 +33,15 @@ class Account
     puts '- If you want to exit - press `exit`'
 
     case gets.chomp
-    when CONSOLE_COMMANDS[:create] then create
-    when CONSOLE_COMMANDS[:load] then load
+    when CONSOLE_COMMANDS[:create] then Account.new.create
+    when CONSOLE_COMMANDS[:load] then Account.new.load
     else exit
     end
   end
 
-  def create
+  def main_menu(current_account)
     loop do
-      name_input
-      age_input
-      login_input
-      password_input
-      break if @errors.length.zero?
-      @errors.each { |e| puts e }
-      @errors = []
-    end
-
-    @card = []
-    new_accounts = accounts << self
-    @current_account = self
-    File.open(@file_path, 'w') { |f| f.write new_accounts.to_yaml }
-    main_menu
-  end
-
-  def load
-    loop do
-      return create_the_first_account if accounts.empty?
-
-      puts 'Enter your login'
-      login = gets.chomp
-      puts 'Enter your password'
-      password = gets.chomp
-
-      if accounts.map { |a| { login: a.login, password: a.password } }.include?({ login: login, password: password })
-        a = accounts.select { |a| login == a.login }.first
-        @current_account = a
-        break
-      else
-        puts 'There is no account with given credentials'
-        next
-      end
-    end
-    main_menu
-  end
-
-  def create_the_first_account
-    puts 'There is no active accounts, do you want to be the first?[y/n]'
-    return gets.chomp == 'y' ? create : console
-  end
-
-  def main_menu
-    loop do
-      puts "\nWelcome, #{@current_account.name}"
+      puts "\nWelcome, #{current_account.name}"
       puts 'If you want to:'
       puts '- show all cards - press SC'
       puts '- create card - press CC'
@@ -121,7 +56,7 @@ class Account
       when MAIN_MENU_COMMANDS[:sc]
         show_cards
       when MAIN_MENU_COMMANDS[:cc]
-        create_card
+        Card.new.create_card(current_account)
       when MAIN_MENU_COMMANDS[:dc]
         destroy_card
       when MAIN_MENU_COMMANDS[:pm]
@@ -131,41 +66,12 @@ class Account
       when MAIN_MENU_COMMANDS[:sm]
         send_money
       when MAIN_MENU_COMMANDS[:da]
-        destroy_account
+        Account.new.destroy_account(current_account)
         exit
       when CONSOLE_COMMANDS[:exit]
         exit
         break
       else puts "Wrong command. Try again!\n"
-      end
-    end
-  end
-
-  def create_card
-    loop do
-      puts 'You could create one of 3 card types'
-      puts '- Usual card. 2% tax on card INCOME. 20$ tax on SENDING money from this card. 5% tax on WITHDRAWING money. For creation this card - press `usual`'
-      puts '- Capitalist card. 10$ tax on card INCOME. 10% tax on SENDING money from this card. 4$ tax on WITHDRAWING money. For creation this card - press `capitalist`'
-      puts '- Virtual card. 1$ tax on card INCOME. 1$ tax on SENDING money from this card. 12% tax on WITHDRAWING money. For creation this card - press `virtual`'
-      puts '- For exit - press `exit`'
-
-      card = case gets.chomp
-      when CARDS[:usual][:type]
-        CARDS[:usual]
-      when CARDS[:capitalist][:type]
-        CARDS[:capitalist]
-      when CARDS[:virtual][:type]
-        CARDS[:virtual]
-      else puts "Wrong card type. Try again!\n"
-      end
-
-      if card
-        cards = @current_account.card << card
-        @current_account.card = cards #important!!!
-        new_accounts = []
-        accounts.each { |ac| ac.login == @current_account.login ? new_accounts.push(@current_account) : new_accounts.push(ac) }
-        File.open(@file_path, 'w') { |f| f.write new_accounts.to_yaml } #Storing
-        break
       end
     end
   end
@@ -373,80 +279,7 @@ class Account
     end
   end
 
-  def destroy_account
-    puts 'Are you sure you want to destroy account?[y/n]'
-    a = gets.chomp
-    if a == 'y'
-      new_accounts = []
-      accounts.each do |ac|
-        if ac.login == @current_account.login
-        else
-          new_accounts.push(ac)
-        end
-      end
-      File.open(@file_path, 'w') { |f| f.write new_accounts.to_yaml } #Storing
-    end
-  end
-
   private
-
-  def name_input
-    puts 'Enter your name'
-    @name = gets.chomp
-    if @name == '' || @name[0].upcase != @name[0]
-      @errors.push('Your name must not be empty and starts with first upcase letter')
-    end
-  end
-
-  def login_input
-    puts 'Enter your login'
-    @login = gets.chomp
-    if @login == ''
-      @errors.push('Login must present')
-    end
-
-    if @login.length < 4
-      @errors.push('Login must be longer then 4 symbols')
-    end
-
-    if @login.length > 20
-      @errors.push('Login must be shorter then 20 symbols')
-    end
-
-    if accounts.map { |a| a.login }.include? @login
-      @errors.push('Such account is already exists')
-    end
-  end
-
-  def password_input
-    puts 'Enter your password'
-    @password = gets.chomp
-    if @password == ''
-      @errors.push('Password must present')
-    end
-
-    if @password.length < 6
-      @errors.push('Password must be longer then 6 symbols')
-    end
-
-    if @password.length > 30
-      @errors.push('Password must be shorter then 30 symbols')
-    end
-  end
-
-  def age_input
-    puts 'Enter your age'
-    @age = gets.chomp
-    if @age.to_i.is_a?(Integer) && @age.to_i >= 23 && @age.to_i <= 90
-      @age = @age.to_i
-    else
-      @errors.push('Your Age must be greeter then 23 and lower then 90')
-    end
-  end
-
-  def accounts
-    File.exists?(@file_path) ? YAML.load_file(@file_path) : []
-  end
 
   def withdraw_tax(type, balance, number, amount)
     case type

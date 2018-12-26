@@ -2,4 +2,4 @@
 
 require_relative 'autoload'
 
-Account.new.console
+Console.new.console

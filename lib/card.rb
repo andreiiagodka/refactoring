@@ -47,4 +47,43 @@ class Card
       end
     end
   end
+
+  def show_cards(current_account)
+    if current_account.card.any?
+      current_account.card.each { |c| puts "- #{c[:number]}, #{c[:type]}" }
+    else
+      puts "There is no active cards!\n"
+    end
+  end
+
+  def destroy_card(current_account)
+    loop do
+      if current_account.card.any?
+        puts 'If you want to delete:'
+
+        current_account.card.each_with_index { |c, i| puts "- #{c[:number]}, #{c[:type]}, press #{i + 1}" }
+        puts "press `exit` to exit\n"
+        answer = gets.chomp
+        break if answer == 'exit'
+        if answer&.to_i.to_i <= current_account.card.length && answer&.to_i.to_i > 0
+          puts "Are you sure you want to delete #{current_account.card[answer&.to_i.to_i - 1][:number]}?[y/n]"
+          a2 = gets.chomp
+          if a2 == 'y'
+            current_account.card.delete_at(answer&.to_i.to_i - 1)
+            new_accounts = []
+            Account.new.accounts.each { |ac| ac.login == current_account.login ? new_accounts.push(current_account) : new_accounts.push(ac) }
+            File.open(current_account.file_path, 'w') { |f| f.write new_accounts.to_yaml } #Storing
+            break
+          else
+            return
+          end
+        else
+          puts "You entered wrong number!\n"
+        end
+      else
+        puts "There is no active cards!\n"
+        break
+      end
+    end
+  end
 end

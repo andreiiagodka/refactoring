@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Account
-  attr_reader :login, :name, :password, :card
+  attr_reader :login, :name, :password, :card, :file_path
 
   ACCOUNTS_FILE_NAME = 'accounts'
   YML_FORMAT = '.yml'

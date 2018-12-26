@@ -2,4 +2,4 @@
 
 require_relative 'autoload'
 
-Console.new.console
+Console.new.greeting

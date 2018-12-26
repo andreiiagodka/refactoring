@@ -3,6 +3,12 @@
 class Account
   attr_reader :login, :name, :password, :card, :file_path
 
+  COMMANDS = {
+    create: 'create',
+    load: 'load',
+    exit: 'exit'
+  }.freeze
+
   ACCOUNTS_FILE_NAME = 'accounts'
   YML_FORMAT = '.yml'
 
@@ -62,6 +68,7 @@ class Account
         end
       end
       File.open(@file_path, 'w') { |f| f.write new_accounts.to_yaml } #Storing
+      exit
     end
   end
 

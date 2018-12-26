@@ -1,0 +1,21 @@
+en:
+  output:
+    greeting: Hello, we are RubyG bank!
+    account_options: |
+      - If you want to create account - press `%{create}`
+      - If you want to load account - press `%{load}`
+      - If you want to exit - press `%{exit}`
+    main_menu_options: |
+      Welcome, %{name}
+      If you want to:
+      - show all cards - press '%{sc}'
+      - create card - press '%{cc}'
+      - destroy card - press '%{dc}'
+      - put money on card - press '%{pm}'
+      - withdraw money on card - press '%{wm}'
+      - send money to another card  - press '%{sm}'
+      - destroy account - press '%{da}'
+      - exit from account - press '%{exit}'
+
+  failing:
+    wrong_command: Wrong command. Try again!

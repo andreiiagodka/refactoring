@@ -4,4 +4,5 @@ require 'pry'
 
 require_relative 'lib/account'
 require_relative 'lib/card'
+require_relative 'lib/money'
 require_relative 'lib/console'

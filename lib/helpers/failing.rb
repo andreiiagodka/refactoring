@@ -15,6 +15,26 @@ class Failing < LocaleHelper
     get_phrase(:invalid_age)
   end
 
+  def empty_login
+    get_phrase(:empty_login)
+  end
+
+  def login_length
+    get_phrase(:login_length)
+  end
+
+  def account_exists
+    get_phrase(:account_exists)
+  end
+
+  def empty_password
+    get_phrase(:empty_password)
+  end
+
+  def password_length
+    get_phrase(:password_length)
+  end
+
   private
 
   def get_phrase(argument, *parameters)

@@ -19,8 +19,14 @@ en:
     enter_name: Enter your name
     enter_age: Enter your age
     enter_login: Enter your login
+    enter_password: Enter your password
 
   failing:
     wrong_command: Wrong command. Try again!
     invalid_name: Your name must not be empty and starts with first upcase letter
     invalid_age: Your Age must be greeter then 23 and lower then 90
+    empty_login: Login must present
+    login_length: Login must be longer then 4 symbols and shorter then 20 symbols
+    account_exists: Such account is already exists
+    empty_password: Password must present
+    password_length: Password must be longer then 6 symbols and shorter then 30 symbols

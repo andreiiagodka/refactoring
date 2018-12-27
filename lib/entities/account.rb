@@ -12,26 +12,23 @@ class Account
   }.freeze
 
   VALID_RANGES = {
-    age: (23..90)
+    age: (23..90),
+    login: (4..20),
+    password: (6..30)
   }.freeze
-
-  def initialize
-    @errors = []
-  end
 
   def create
     loop do
+      @errors = []
       @name = name_input
       @age = age_input
       @login = login_input
       @password = password_input
-      break if @errors.length.zero?
-      @errors.each { |e| puts e }
-      @errors = []
-    end
+      break if @errors.empty?
 
+      output.show(@errors)
+    end
     save_to_db(self)
-    Console.new.main_menu(self)
   end
 
   def load
@@ -111,38 +108,25 @@ class Account
 
   def login_input
     output.enter_login
-    @login = gets.chomp
-    if @login == ''
-      @errors.push('Login must present')
-    end
+    validate_login(user_input)
+  end
 
-    if @login.length < 4
-      @errors.push('Login must be longer then 4 symbols')
-    end
-
-    if @login.length > 20
-      @errors.push('Login must be shorter then 20 symbols')
-    end
-
-    if load_from_db.map { |a| a.login }.include? @login
-      @errors.push('Such account is already exists')
-    end
+  def validate_login(login)
+    @errors << failing.empty_login if login.empty?
+    @errors << failing.login_length unless VALID_RANGES[:login].include? login.length
+    @errors << failing.account_exists if load_from_db.map { |a| a.login }.include? login
+    login
   end
 
   def password_input
-    puts 'Enter your password'
-    @password = gets.chomp
-    if @password == ''
-      @errors.push('Password must present')
-    end
+    output.enter_password
+    validate_password(user_input)
+  end
 
-    if @password.length < 6
-      @errors.push('Password must be longer then 6 symbols')
-    end
-
-    if @password.length > 30
-      @errors.push('Password must be shorter then 30 symbols')
-    end
+  def validate_password(password)
+    @errors << failing.empty_password if password.empty?
+    @errors << failing.password_length unless VALID_RANGES[:password].include? password.length
+    password
   end
 
   def create_the_first_account

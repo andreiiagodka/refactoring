@@ -44,6 +44,10 @@ class Output < LocaleHelper
     show_in_console(:enter_login)
   end
 
+  def enter_password
+    show_in_console(:enter_password)
+  end
+
   private
 
   def show_in_console(argument, *parameters)

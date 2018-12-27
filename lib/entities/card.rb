@@ -42,7 +42,7 @@ class Card
         # current_account.card = cards #important!!!
         new_accounts = []
         Account.new.accounts.each { |ac| ac.login == current_account.login ? new_accounts.push(current_account) : new_accounts.push(ac) }
-        File.open(current_account.file_path, 'w') { |f| f.write new_accounts.to_yaml } #Storing
+        File.open(Account::STORAGE_YML, 'w') { |f| f.write new_accounts.to_yaml } #Storing
         break
       end
     end
@@ -72,7 +72,7 @@ class Card
             current_account.card.delete_at(answer&.to_i.to_i - 1)
             new_accounts = []
             Account.new.accounts.each { |ac| ac.login == current_account.login ? new_accounts.push(current_account) : new_accounts.push(ac) }
-            File.open(current_account.file_path, 'w') { |f| f.write new_accounts.to_yaml } #Storing
+            File.open(Account::STORAGE_YML, 'w') { |f| f.write new_accounts.to_yaml } #Storing
             break
           else
             return

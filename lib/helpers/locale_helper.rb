@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class I18nHelper
+class LocaleHelper
   def get(section, argument, *parameters)
     string_argument = argument.to_s
     I18n.t("#{section}.#{string_argument}", *parameters)

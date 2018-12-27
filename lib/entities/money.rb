@@ -25,7 +25,7 @@ class Money
                 current_account.card[answer&.to_i.to_i - 1] = current_card
                 new_accounts = []
                 Account.new.accounts.each { |ac| ac.login == current_account.login ? new_accounts.push(current_account) : new_accounts.push(ac) }
-                File.open(current_account.file_path, 'w') { |f| f.write new_accounts.to_yaml } #Storing
+                File.open(Account::STORAGE_YML, 'w') { |f| f.write new_accounts.to_yaml } #Storing
                 puts "Money #{a2&.to_i.to_i} was put on #{current_card[:number]}. Balance: #{current_card[:balance]}. Tax: #{put_tax(current_card[:type], current_card[:balance], current_card[:number], a2&.to_i.to_i)}"
                 return
               end
@@ -67,7 +67,7 @@ class Money
                 current_account.card[answer&.to_i.to_i - 1] = current_card
                 new_accounts = []
                 Account.new.accounts.each { |ac| ac.login == current_account.login ? new_accounts.push(current_account) : new_accounts.push(ac) }
-                File.open(current_account.file_path, 'w') { |f| f.write new_accounts.to_yaml } #Storing
+                File.open(Account::STORAGE_YML, 'w') { |f| f.write new_accounts.to_yaml } #Storing
                 puts "Money #{a2&.to_i.to_i} withdrawed from #{current_card[:number]}$. Money left: #{current_card[:balance]}$. Tax: #{withdraw_tax(current_card[:type], current_card[:balance], current_card[:number], a2&.to_i.to_i)}$"
                 return
               else

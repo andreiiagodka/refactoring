@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Output < I18nHelper
+class Output < LocaleHelper
   OUTPUT = 'output'
 
   def show(argument)
@@ -30,6 +30,18 @@ class Output < I18nHelper
                     sm: commands[:sm],
                     da: commands[:da],
                     exit: Account::COMMANDS[:exit])
+  end
+
+  def enter_name
+    show_in_console(:enter_name)
+  end
+
+  def enter_age
+    show_in_console(:enter_age)
+  end
+
+  def enter_login
+    show_in_console(:enter_login)
   end
 
   private

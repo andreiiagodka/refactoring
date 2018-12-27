@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
 class Account
-  attr_reader :login, :name, :password, :card, :file_path
+  include Database
+
+  attr_reader :login, :name, :password, :card
 
   COMMANDS = {
     create: 'create',
@@ -9,43 +11,40 @@ class Account
     exit: 'exit'
   }.freeze
 
-  ACCOUNTS_FILE_NAME = 'accounts'
-  YML_FORMAT = '.yml'
+  VALID_RANGES = {
+    age: (23..90)
+  }.freeze
 
   def initialize
     @errors = []
-    @file_path = ACCOUNTS_FILE_NAME + YML_FORMAT
   end
 
   def create
     loop do
-      name_input
-      age_input
-      login_input
-      password_input
+      @name = name_input
+      @age = age_input
+      @login = login_input
+      @password = password_input
       break if @errors.length.zero?
       @errors.each { |e| puts e }
       @errors = []
     end
 
-    @card = []
-    new_accounts = accounts << self
-    @current_account = self
-    File.open(@file_path, 'w') { |f| f.write new_accounts.to_yaml }
-    Console.new.main_menu(@current_account)
+    save_to_db(self)
+    Console.new.main_menu(self)
   end
 
   def load
     loop do
-      return create_the_first_account if accounts.empty?
+      return create_the_first_account if load_from_db.empty?
 
       puts 'Enter your login'
       login = gets.chomp
       puts 'Enter your password'
       password = gets.chomp
 
-      if accounts.map { |a| { login: a.login, password: a.password } }.include?({ login: login, password: password })
-        a = accounts.select { |a| login == a.login }.first
+      if load_from_db.map { |a| { login: a.login, password: a.password } }.include?({ login: login, password: password })
+        a = load_from_db.select { |a| login == a.login }.first
         @current_account = a
         break
       else
@@ -61,43 +60,57 @@ class Account
     a = gets.chomp
     if a == 'y'
       new_accounts = []
-      accounts.each do |ac|
+      load_from_db.each do |ac|
         if ac.login == current_account.login
         else
           new_accounts.push(ac)
         end
       end
-      File.open(@file_path, 'w') { |f| f.write new_accounts.to_yaml } #Storing
+      File.open(STORAGE_YML, 'w') { |f| f.write new_accounts.to_yaml } #Storing
       exit
     end
   end
 
   def accounts
-    File.exists?(@file_path) ? YAML.load_file(@file_path) : []
+    load_from_db
   end
 
   private
 
   def name_input
-    puts 'Enter your name'
-    @name = gets.chomp
-    if @name == '' || @name[0].upcase != @name[0]
-      @errors.push('Your name must not be empty and starts with first upcase letter')
-    end
+    output.enter_name
+    validate_name(user_input)
+  end
+
+  def validate_name(name)
+    @errors << failing.invalid_name if name.empty? || !first_in_uppercase?(name)
+    name
+  end
+
+  def first_in_uppercase?(name)
+    name.chars.first.upcase == name.chars.first
   end
 
   def age_input
-    puts 'Enter your age'
-    @age = gets.chomp
-    if @age.to_i.is_a?(Integer) && @age.to_i >= 23 && @age.to_i <= 90
-      @age = @age.to_i
-    else
-      @errors.push('Your Age must be greeter then 23 and lower then 90')
-    end
+    output.enter_age
+    validate_age(user_input)
+  end
+
+  def validate_age(age)
+    @errors << failing.invalid_age unless integer?(age) || age_in_range?(age)
+    age.to_i
+  end
+
+  def integer?(age)
+    age.to_i.to_s == age.to_i
+  end
+
+  def age_in_range?(age)
+    VALID_RANGES[:age].include?(age.to_i)
   end
 
   def login_input
-    puts 'Enter your login'
+    output.enter_login
     @login = gets.chomp
     if @login == ''
       @errors.push('Login must present')
@@ -111,7 +124,7 @@ class Account
       @errors.push('Login must be shorter then 20 symbols')
     end
 
-    if accounts.map { |a| a.login }.include? @login
+    if load_from_db.map { |a| a.login }.include? @login
       @errors.push('Such account is already exists')
     end
   end
@@ -135,5 +148,17 @@ class Account
   def create_the_first_account
     puts 'There is no active accounts, do you want to be the first?[y/n]'
     return gets.chomp == 'y' ? create : Console.new.console
+  end
+
+  def user_input
+    gets.chomp
+  end
+
+  def output
+    @output ||= Output.new
+  end
+
+  def failing
+    @failing ||= Failing.new
   end
 end

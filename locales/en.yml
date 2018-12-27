@@ -16,6 +16,11 @@ en:
       - send money to another card  - press '%{sm}'
       - destroy account - press '%{da}'
       - exit from account - press '%{exit}'
+    enter_name: Enter your name
+    enter_age: Enter your age
+    enter_login: Enter your login
 
   failing:
     wrong_command: Wrong command. Try again!
+    invalid_name: Your name must not be empty and starts with first upcase letter
+    invalid_age: Your Age must be greeter then 23 and lower then 90
